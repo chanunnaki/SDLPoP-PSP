@@ -5,6 +5,17 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
 
 ## Key Features & Enhancements
 
+- **Real-Time In-Memory Rewind System (NEW in v1.1.0 — Headline Feature)**:
+  - **Hold L Shoulder** (or **L/R** on keyboard) anytime during forward gameplay or after the Prince dies to seamlessly roll back time!
+  - **Dynamic Variable-Speed Rewind**: While holding L Shoulder, tap or hold **D-Pad Left ($\leftarrow$)** or **Right ($\rightarrow$)** to smoothly shift rewind speed from $1\times$ up to $4\times$, complete with real-time on-screen HUD speed indicators (`<<`, `<<<`, `<<<<`).
+  - **High-Performance In-RAM Circular Ring Buffer**: Captures complete game state snapshots at 12 FPS with zero disk I/O, protecting your Memory Stick.
+  - **Comprehensive State Rollback**: Seamlessly rewinds the Kid, guard positions & HP, active chompers, loose falling floors, closing gates, spikes, and the master level countdown clock.
+  - **Perfect Edge-Case Handling**: Instant neighbor room rendering across screen transitions, and automatic clean triangular HP HUD restoration when rewinding across life potions.
+  - **Handheld-Tuned Settings**: Configure buffer size under **Settings $\to$ GAMEPLAY $\to$ Rewind**: `OFF`, `30 SEC` (~1.4MB RAM), or `60 SEC` (~2.8MB RAM).
+- **Hardware VSync-Locked Pipeline & Rapid 12 Hz Screen Strobing (v1.1.0)**:
+  - Hardware-synchronized `NEXTFRAME` display buffer exchange with post-present vertical blanking waits eliminates 100% of horizontal tearing and mid-screen buffer cuts across the entire PSP LCD screen.
+  - Sword pickup and healing potions produce authentic, tear-free rapid 12 Hz flash strobes synced to the hardware refresh rate.
+  - Eliminates GPU/scanout raster collisions in 60 FPS cutscenes and fixes cutscene surface buffer geometry.
 - **Decoupled 1:1 Integer Text & Menu Overlay**:
   - The in-game pause menu, settings sub-menus, level customization dialog, and confirmation dialogs bypass the game playfield and render at **strict 1:1 integer scale ($320 \times 200$)** centered over a GPU-blended semi-transparent dimmed backdrop.
   - Eliminates all font distortion, blurred edges, and text shimmering on the PSP screen, regardless of the chosen game aspect ratio or widescreen stretch.
@@ -37,17 +48,6 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
   - Displays active levelset status (`ACTIVE` indicator) and switches mods on-the-fly without returning to the PSP XMB.
   - Seamless in-memory soft reset reloads graphics, sounds, and levels, restarting directly into the mod's title and intro sequence.
   - Safe error recovery: if a configured mod folder is missing or deleted, the game warns the player, automatically reverts to the original game, and heals `SDLPoP.ini`.
-- **Real-Time In-Memory Ring-Buffer Rewind (30s / 60s)**:
-  - Hold **L Shoulder** (or **L/R** on keyboard) anytime during gameplay or after the Prince dies to fluidly roll back time (smooth acceleration from 1x to 2x speed).
-  - High-performance circular in-RAM buffer captures game states at 12 FPS without touching the Memory Stick.
-  - Seamlessly restores Kid position, guard positions and HP, chompers, falling loose floors, gates, spikes, and the level countdown clock.
-  - Releasing **L Shoulder** immediately resumes forward play from the rewound point, overwriting future history.
-  - Configurable under **Settings $\to$ GAMEPLAY $\to$ Rewind**: `OFF`, `30 SEC` (~1.4MB RAM), or `60 SEC` (~2.8MB RAM).
-- **Hardware VSync-Locked Pipeline & Rapid 12 Hz Screen Strobing (v1.1.0)**:
-  - Hardware-synchronized `NEXTFRAME` display buffer exchange with post-present vertical blanking waits eliminates 100% of horizontal tearing and mid-screen buffer cuts across the entire PSP LCD screen.
-  - Sword pickup and healing potions produce authentic, tear-free rapid 12 Hz flash strobes synced to the hardware refresh rate.
-  - Eliminates GPU/scanout raster collisions in 60 FPS cutscenes and fixes cutscene surface buffer geometry.
-  - Rewind enhancements: clean triangular HP HUD restoration across life potions, and instant neighbor room rendering during boundary rewinds.
 - **Ergonomic Handheld Controls**:
   - Smooth action on Face buttons and Shoulder triggers tailored for handheld play.
 
