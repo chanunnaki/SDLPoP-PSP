@@ -41,6 +41,7 @@ extern "C" {
 #ifdef __PSP__
 #include <pspkernel.h>
 #include <pspdisplay.h>
+#include <pspgu.h>
 #endif
 
 #ifndef _MSC_VER // unistd.h does not exist in the Windows SDK.
