@@ -365,23 +365,24 @@ int play_level_2() {
 		if (need_replay_cycle) replay_cycle();
 #endif
 		if (rewind_mode != REWIND_MODE_OFF && rewind_is_held()) {
+			rewind_handle_speed_input();
 			if (rewind_step_backward()) {
 				redraw_screen(0);
 				draw_hp();
-				display_text_bottom("<< REWIND");
+				display_text_bottom(rewind_get_banner_text(false));
 				text_time_remaining = 2;
 				text_time_total = 2;
 				idle();
-				delay_ticks(3);
+				delay_ticks(2);
 				continue;
 			} else if (rewind_get_count() == 0) {
 				redraw_screen(0);
 				draw_hp();
-				display_text_bottom("<< REWIND (LIMIT)");
+				display_text_bottom(rewind_get_banner_text(true));
 				text_time_remaining = 2;
 				text_time_total = 2;
 				idle();
-				delay_ticks(3);
+				delay_ticks(2);
 				continue;
 			}
 		} else {

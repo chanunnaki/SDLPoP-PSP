@@ -22,5 +22,8 @@ bool rewind_is_held(void);
 int  rewind_get_hold_ticks(void);
 void rewind_reset_hold_ticks(void);
 int  rewind_get_count(void);
+int  rewind_get_speed_level(void);
+void rewind_handle_speed_input(void);
+const char* rewind_get_banner_text(bool is_limit);
 
 #endif // REWIND_H

@@ -20,6 +20,9 @@ typedef struct {
 
 static rewind_ring_buffer_t rewind_buf = {NULL, 0, 0, 0};
 static int rewind_hold_ticks = 0;
+static int rewind_speed_level = 2; // 2..5 arrows ("<<" up to "<<<<<")
+static int prev_dpad_left = 0;
+static int prev_dpad_right = 0;
 
 static byte*  rewind_serialize_target = NULL;
 static size_t rewind_serialize_offset = 0;
@@ -87,12 +90,18 @@ void rewind_free(void) {
 	rewind_buf.head = 0;
 	rewind_buf.count = 0;
 	rewind_hold_ticks = 0;
+	rewind_speed_level = 2;
+	prev_dpad_left = 0;
+	prev_dpad_right = 0;
 }
 
 void rewind_clear(void) {
 	rewind_buf.head = 0;
 	rewind_buf.count = 0;
 	rewind_hold_ticks = 0;
+	rewind_speed_level = 2;
+	prev_dpad_left = 0;
+	prev_dpad_right = 0;
 }
 
 void rewind_record_frame(void) {
@@ -132,15 +141,98 @@ bool rewind_is_held(void) {
 	return false;
 }
 
+void rewind_handle_speed_input(void) {
+	rewind_hold_ticks++;
+
+	int curr_dpad_left = 0;
+	int curr_dpad_right = 0;
+
+#ifdef __PSP__
+	SceCtrlData pad;
+	sceCtrlPeekBufferPositive(&pad, 1);
+	curr_dpad_left = (pad.Buttons & PSP_CTRL_LEFT) != 0;
+	curr_dpad_right = (pad.Buttons & PSP_CTRL_RIGHT) != 0;
+#endif
+	if (!curr_dpad_left) {
+		curr_dpad_left = (joy_button_states[JOYINPUT_DPAD_LEFT] & KEYSTATE_HELD) != 0 ||
+		                 (key_states[SDL_SCANCODE_LEFT] & KEYSTATE_HELD) != 0;
+	}
+	if (!curr_dpad_right) {
+		curr_dpad_right = (joy_button_states[JOYINPUT_DPAD_RIGHT] & KEYSTATE_HELD) != 0 ||
+		                  (key_states[SDL_SCANCODE_RIGHT] & KEYSTATE_HELD) != 0;
+	}
+
+	// Tap D-pad Left: shift up to next gear (up to 5 arrows "<<<<<")
+	if (curr_dpad_left && !prev_dpad_left) {
+		if (rewind_speed_level < 5) {
+			rewind_speed_level++;
+		}
+	}
+	// Tap D-pad Right: shift down to previous gear (down to 1 arrow "<")
+	if (curr_dpad_right && !prev_dpad_right) {
+		if (rewind_speed_level > 1) {
+			rewind_speed_level--;
+		}
+	}
+	prev_dpad_left = curr_dpad_left;
+	prev_dpad_right = curr_dpad_right;
+}
+
+int rewind_get_speed_level(void) {
+	return rewind_speed_level;
+}
+
+const char* rewind_get_banner_text(bool is_limit) {
+	static char banner[32];
+	int arrows = rewind_speed_level;
+	if (arrows < 1) arrows = 1;
+	if (arrows > 5) arrows = 5;
+	int idx = 0;
+	for (int i = 0; i < arrows; i++) {
+		banner[idx++] = '<';
+	}
+	banner[idx++] = ' ';
+	if (is_limit) {
+		strcpy(banner + idx, "REWIND (LIMIT)");
+	} else {
+		strcpy(banner + idx, "REWIND");
+	}
+	return banner;
+}
+
 int rewind_step_backward(void) {
 	if (rewind_mode == REWIND_MODE_OFF || rewind_buf.slots == NULL || rewind_buf.count <= 0) {
 		return 0;
 	}
 
-	rewind_hold_ticks++;
+	if (rewind_speed_level == 1) {
+		// Half-speed precision mode: only step backward on even hold ticks
+		if ((rewind_hold_ticks % 2) != 0) {
+			return 1;
+		}
+	}
 
-	// Step 1 frame at a time for smooth reverse animation
+	// Determine step size based on gear:
+	// Level 1 ("<"):      half-speed (1 frame per 2 ticks @ 30 FPS = ~1.25x forward speed)
+	// Level 2 ("<<"):     step 1 (1 frame per tick @ 30 FPS = ~2.5x forward speed)
+	// Level 3 ("<<<"):    step 2 (2 frames per tick @ 30 FPS = ~5.0x forward speed)
+	// Level 4 ("<<<<"):   step 3 (3 frames per tick @ 30 FPS = ~7.5x forward speed)
+	// Level 5 ("<<<<<"):  step 5 (5 frames per tick @ 30 FPS = ~12.5x forward speed)
 	int step = 1;
+	if (rewind_speed_level == 3) {
+		step = 2;
+	} else if (rewind_speed_level == 4) {
+		step = 3;
+	} else if (rewind_speed_level >= 5) {
+		step = 5;
+	}
+
+	if (step > rewind_buf.count) {
+		step = rewind_buf.count;
+	}
+	if (step <= 0) {
+		return 0;
+	}
 
 	// Move head back by step
 	rewind_buf.head = (rewind_buf.head - step + rewind_buf.capacity) % rewind_buf.capacity;
@@ -194,6 +286,9 @@ int rewind_get_hold_ticks(void) {
 
 void rewind_reset_hold_ticks(void) {
 	rewind_hold_ticks = 0;
+	rewind_speed_level = 2; // reset back to 2 arrows for next rewind
+	prev_dpad_left = 0;
+	prev_dpad_right = 0;
 }
 
 int rewind_get_count(void) {
