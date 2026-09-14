@@ -3,53 +3,33 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
 
 ---
 
-## Key Features & Enhancements
+## What's New in v1.1.0
 
-- **Real-Time In-Memory Rewind System (NEW in v1.1.0 — Headline Feature)**:
-  - **Hold L Shoulder** (or **L/R** on keyboard) anytime during forward gameplay or after the Prince dies to seamlessly roll back time!
-  - **Dynamic Variable-Speed Rewind**: While holding L Shoulder, tap or hold **D-Pad Left ($\leftarrow$)** or **Right ($\rightarrow$)** to smoothly shift rewind speed from $1\times$ up to $4\times$, complete with real-time on-screen HUD speed indicators (`<<`, `<<<`, `<<<<`).
-  - **High-Performance In-RAM Circular Ring Buffer**: Captures complete game state snapshots at 12 FPS with zero disk I/O, protecting your Memory Stick.
-  - **Comprehensive State Rollback**: Seamlessly rewinds the Kid, guard positions & HP, active chompers, loose falling floors, closing gates, spikes, and the master level countdown clock.
-  - **Perfect Edge-Case Handling**: Instant neighbor room rendering across screen transitions, and automatic clean triangular HP HUD restoration when rewinding across life potions.
-  - **Handheld-Tuned Settings**: Configure buffer size under **Settings $\to$ GAMEPLAY $\to$ Rewind**: `OFF`, `30 SEC` (~1.4MB RAM), or `60 SEC` (~2.8MB RAM).
-- **Hardware VSync-Locked Pipeline & Rapid 12 Hz Screen Strobing (v1.1.0)**:
-  - Hardware-synchronized `NEXTFRAME` display buffer exchange with post-present vertical blanking waits eliminates 100% of horizontal tearing and mid-screen buffer cuts across the entire PSP LCD screen.
-  - Sword pickup and healing potions produce authentic, tear-free rapid 12 Hz flash strobes synced to the hardware refresh rate.
-  - Eliminates GPU/scanout raster collisions in 60 FPS cutscenes and fixes cutscene surface buffer geometry.
-- **Decoupled 1:1 Integer Text & Menu Overlay**:
-  - The in-game pause menu, settings sub-menus, level customization dialog, and confirmation dialogs bypass the game playfield and render at **strict 1:1 integer scale ($320 \times 200$)** centered over a GPU-blended semi-transparent dimmed backdrop.
-  - Eliminates all font distortion, blurred edges, and text shimmering on the PSP screen, regardless of the chosen game aspect ratio or widescreen stretch.
-- **$2\times$ Integer Status Bar / HUD Split**:
-  - **Playfield ($192\text{ px}$)**: Scaled to $256\text{ px}$ ($192 \times 4/3$).
-  - **Status bar / HUD ($8\text{ px}$)**: Scaled to $16\text{ px}$ ($8 \times 2$) — an exact $2\times$ integer vertical scale.
-  - Eliminates scanline interpolation and shimmering on the Kid's HP triangles, guard's HP triangles, and bottom status messages ("GAME PAUSED", "LEVEL 1", time remaining).
-- **Multiple Display Modes**:
-  - `16:10`: Authentic Prince of Persia aspect ratio ($436 \times 272$, 22px symmetrical black pillars).
-  - `16:9 Wide`: Full widescreen stretch across the entire screen ($480 \times 272$).
-  - `4:3`: Authentic DOS CRT aspect ratio ($362 \times 272$, 59px symmetrical black pillars).
-- **Switchable Visual Asset Packs (DOS / SNES / SNES Alt)**:
-  - Switch graphics styles live on-the-fly from the in-game **Visuals $\to$ Graphics pack** menu or via `SDLPoP.ini`:
-    - **DOS**: Classic authentic PC MS-DOS visuals (`res_dos.pak`, default).
-    - **SNES**: Super Nintendo 16-bit sprites and color palettes (`res_snes.pak`).
-    - **SNES Alt**: Hybrid 256-color palette adaptation by Maurice Kaltofen / mk1995 (`res_snes_alt.pak`).
-  - **Zero-Latency In-RAM PAK Architecture**: Assets are pre-baked into binary archives (`data/res_*.pak`), replacing ~1,000+ loose file operations on the slow Memory Stick with instant in-memory switching while preserving the authentic original 12-level campaign and gameplay.
-- **On-Demand OGG Music Streaming**:
-  - Bundled with all 22 official authentic DOS OGG music tracks in `data/music/`.
-  - Streams on-demand via `stb_vorbis` without startup preloading or memory bloat (~150KB peak RAM vs 20MB).
-- **Expanded Hardware Memory**:
-  - Unlocked the full 64MB user memory partition on PSP-2000/3000/Go (`MEMSIZE 1` in PRX).
-  - Configured a 51MB+ continuous newlib runtime heap (`PSP_HEAP_SIZE_KB(-2048)`).
-- **Hardware-Tuned Audio**:
-  - Increased DMA audio buffer to 2048 samples (46.4ms) to eliminate buffer underruns and comb-filter phasing on hardware.
-  - Safe saturation clamping to $[-32768, 32767]$ prevents digital clipping when music and sound effects overlap.
-  - Lightweight stack chunk mixing replaces per-chunk heap allocations in real-time audio thread.
-- **In-Game MODS & Levelset Selector**:
-  - Dynamically scans the `mods/` directory and lists custom mods alongside the **Original Game** directly inside the in-game menu (**Settings $\to$ MODS**).
-  - Displays active levelset status (`ACTIVE` indicator) and switches mods on-the-fly without returning to the PSP XMB.
-  - Seamless in-memory soft reset reloads graphics, sounds, and levels, restarting directly into the mod's title and intro sequence.
-  - Safe error recovery: if a configured mod folder is missing or deleted, the game warns the player, automatically reverts to the original game, and heals `SDLPoP.ini`.
-- **Ergonomic Handheld Controls**:
-  - Smooth action on Face buttons and Shoulder triggers tailored for handheld play.
+- **Real-Time Rewind (Headline Feature)**:
+  - **Hold L Shoulder** anytime to rewind time! Missed a jump, mistimed a parry, or fell on spikes? Hold **L** to roll back your mistake and try again.
+  - **Variable Speed**: While holding L, tap or hold **Left** or **Right** on the D-Pad to speed up rewind from 1x up to 4x.
+  - **Configurable**: Choose between **30 Seconds**, **60 Seconds**, or **Off** in **Settings $\to$ GAMEPLAY $\to$ Rewind**.
+- **Tear-Free Screen Flashes**:
+  - Sword pickup and healing potions now produce clean, authentic screen flashes with zero screen tearing or scanline glitches.
+  - Fixed cutscene display glitches after Level 1.
+
+---
+
+## Features
+
+- **Crystal-Clear Menus & Crisp HUD**:
+  - Menus and text overlays are pixel-sharp, easy to read, and never blur or distort regardless of your chosen screen aspect ratio.
+  - Health bars and status messages are scaled cleanly with zero flickering.
+- **Widescreen & Classic Display Modes**:
+  - Choose between **16:10** (Original PC), **16:9** (Full PSP Widescreen), or **4:3** (Classic CRT) from the pause menu.
+- **Switch Graphics on the Fly (DOS / SNES)**:
+  - Switch between original **DOS** graphics, enhanced **Super Nintendo** (SNES) visuals, or the hybrid **SNES Alt** pack directly from **Visuals $\to$ Graphics pack**—no restarts required.
+- **In-Game Mod Manager**:
+  - Play custom levelsets and full conversion mods right on your PSP! Drop mod folders into `mods/` and switch between them inside **Settings $\to$ MODS**.
+- **Original Soundtrack & Audio**:
+  - Full authentic 22-track musical score and sound effects, balanced cleanly for the PSP speakers and headphones.
+- **Handheld-Tuned Controls**:
+  - Responsive, natural control mapping built specifically for the PSP's D-pad, face buttons, and triggers.
 
 ---
 
@@ -184,7 +164,7 @@ For upstream PC/DOS documentation, modding specifications, CusPoP support, repla
 - **Jordan Mechner**: Creator of the original Prince of Persia
 - **PSPDEV**: [pspdev](https://github.com/pspdev/pspdev) toolchain and SDK libraries
 - **striga, sharkwouter**: Initial PSP scaffolding
-- **chanunnaki**: Enhanced PSP port (decoupled 1:1 overlay, 2x integer HUD split, streaming audio, 64MB RAM unlock, modern CMake build, fast binary PAK asset runtime)
+- **chanunnaki**: Enhanced PSP port, rewind system, widescreen rendering, and in-game mod manager
 
 ### Graphics Packs & Custom Level Authors
 - **KJ**: Creator of *SNES Remnants* (`0000149` / `0000296` on [popot.org](https://www.popot.org/custom_levels.php?mod=0000149)), source for the **SNES Graphics Pack** (`res_snes.pak`):
