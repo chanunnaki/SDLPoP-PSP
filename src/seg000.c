@@ -1474,13 +1474,16 @@ void set_health_life() {
 void draw_hp() {
 	static short last_drawn_hitp_max = -1;
 	static short last_drawn_guardhp_max = -1;
+	static short last_drawn_guard_room = -1;
 
-	if (hitp_delta || last_drawn_hitp_max != hitp_max) {
-		// If max HP decreased (e.g. rewound before a life potion), clear extra triangles
+	// Only clear extra triangles if max HP actually decreased (e.g. rewound before a life potion)
+	if (last_drawn_hitp_max > hitp_max) {
 		if (hitp_max >= 0 && (short)(hitp_max * 7) < rect_bottom_text.left) {
-			rect_type rect_clear_hp = {192, (short)(hitp_max * 7), 200, rect_bottom_text.left};
+			rect_type rect_clear_hp = {193, (short)(hitp_max * 7), 200, rect_bottom_text.left};
 			draw_rect(&rect_clear_hp, color_0_black);
 		}
+	}
+	if (hitp_delta || last_drawn_hitp_max != hitp_max) {
 		draw_kid_hp(hitp_curr, hitp_max);
 		last_drawn_hitp_max = hitp_max;
 	}
@@ -1499,19 +1502,24 @@ void draw_hp() {
 			draw_kid_hp(0, 1);
 		}
 	}
-	if (guardhp_delta || last_drawn_guardhp_max != guardhp_max) {
+
+	// Only clear guard area when guard max HP decreases or guard leaves the room
+	if (last_drawn_guardhp_max > guardhp_max || (last_drawn_guard_room != Guard.room && Guard.room != drawn_room)) {
 		if (Guard.room != drawn_room || guardhp_max == 0) {
-			rect_type rect_clear_guard = {192, rect_bottom_text.right, 200, 320};
+			rect_type rect_clear_guard = {193, rect_bottom_text.right, 200, 320};
 			draw_rect(&rect_clear_guard, color_0_black);
 		} else {
 			short guard_left = 314 - (guardhp_max - 1) * 7;
 			if (guard_left > rect_bottom_text.right) {
-				rect_type rect_clear_guard = {192, rect_bottom_text.right, 200, guard_left};
+				rect_type rect_clear_guard = {193, rect_bottom_text.right, 200, guard_left};
 				draw_rect(&rect_clear_guard, color_0_black);
 			}
 		}
+	}
+	if (guardhp_delta || last_drawn_guardhp_max != guardhp_max || last_drawn_guard_room != Guard.room) {
 		draw_guard_hp(guardhp_curr, guardhp_max);
 		last_drawn_guardhp_max = guardhp_max;
+		last_drawn_guard_room = Guard.room;
 	}
 	if (guardhp_curr == 1) {
 		if (blink_state) {

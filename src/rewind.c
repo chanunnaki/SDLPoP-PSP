@@ -23,6 +23,7 @@ static int rewind_hold_ticks = 0;
 static int rewind_speed_level = 2; // 2..5 arrows ("<<" up to "<<<<<")
 static int prev_dpad_left = 0;
 static int prev_dpad_right = 0;
+static word last_rewind_drawn_room = 0;
 
 static byte*  rewind_serialize_target = NULL;
 static size_t rewind_serialize_offset = 0;
@@ -93,6 +94,7 @@ void rewind_free(void) {
 	rewind_speed_level = 2;
 	prev_dpad_left = 0;
 	prev_dpad_right = 0;
+	last_rewind_drawn_room = 0;
 }
 
 void rewind_clear(void) {
@@ -102,6 +104,7 @@ void rewind_clear(void) {
 	rewind_speed_level = 2;
 	prev_dpad_left = 0;
 	prev_dpad_right = 0;
+	last_rewind_drawn_room = 0;
 }
 
 void rewind_record_frame(void) {
@@ -253,13 +256,14 @@ int rewind_step_backward(void) {
 		is_feather_fall = 0;
 	}
 
-	// Update room links if room changed, but DO NOT set different_room = 1 (prevents black screen flash)
-	if (drawn_room != Kid.room) {
-		next_room = drawn_room = Kid.room;
-		load_room_links();
+	// Always sync camera with Kid's room and reload room links immediately
+	next_room = drawn_room = Kid.room;
+	load_room_links();
+	if (drawn_room != last_rewind_drawn_room) {
 		if (custom->tbl_level_type[current_level]) {
 			gen_palace_wall_colors();
 		}
+		last_rewind_drawn_room = drawn_room;
 	}
 	different_room = 0;
 	need_full_redraw = 0;
@@ -289,6 +293,7 @@ void rewind_reset_hold_ticks(void) {
 	rewind_speed_level = 2; // reset back to 2 arrows for next rewind
 	prev_dpad_left = 0;
 	prev_dpad_right = 0;
+	last_rewind_drawn_room = 0;
 }
 
 int rewind_get_count(void) {
