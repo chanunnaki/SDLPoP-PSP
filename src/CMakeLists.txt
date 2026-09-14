@@ -80,6 +80,7 @@ set(SOURCE_FILES
         menu.c
         stb_vorbis.c
         pak.c
+        rewind.c rewind.h
         icon.rc
         )
 

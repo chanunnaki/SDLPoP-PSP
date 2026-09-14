@@ -259,8 +259,6 @@ int process_load(void* data, size_t data_size) {
 	return fread(data, data_size, 1, quick_fp) == 1;
 }
 
-typedef int process_func_type(void* data, size_t data_size);
-
 int quick_process(process_func_type process_func) {
 	int ok = 1;
 #define process(x) ok = ok && process_func(&(x), sizeof(x))
@@ -467,6 +465,7 @@ int quick_load(void) {
 		quick_fp = NULL;
 
 		restore_room_after_quick_load();
+		rewind_clear();
 		update_screen();
 
 		#ifdef USE_QUICKLOAD_PENALTY
@@ -1414,7 +1413,7 @@ void read_joyst_control() {
 	if (joy_button_states[JOYINPUT_X] & key_state ||
 #ifdef __PSP__
 			joy_button_states[JOYINPUT_A] & key_state ||
-			joy_button_states[JOYINPUT_LEFTSHOULDER] & key_state ||
+			(rewind_mode == 0 && (joy_button_states[JOYINPUT_LEFTSHOULDER] & key_state)) ||
 			joy_button_states[JOYINPUT_RIGHTSHOULDER] & key_state ||
 #endif
 			joy_axis_ptr[SDL_CONTROLLER_AXIS_TRIGGERLEFT] > 8000 ||

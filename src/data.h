@@ -746,6 +746,7 @@ extern char gamecontrollerdb_file[POP_MAX_PATH] INIT(= "");
 extern byte enable_quicksave INIT(= 1);
 extern byte enable_quicksave_penalty INIT(= 1);
 extern byte enable_replay INIT(= 1);
+extern byte rewind_mode INIT(= 1);
 #ifdef __PSP__
 extern byte use_hardware_acceleration INIT(= 1);
 extern byte psp_display_mode INIT(= 0);

@@ -120,6 +120,7 @@ void play_level(int level_number) {
 		#endif
 		draw_level_first();
 		show_copyprot(0);
+		rewind_clear();
 		level_number = play_level_2();
 		// hacked...
 #ifdef USE_COPYPROT
@@ -363,6 +364,34 @@ int play_level_2() {
 #ifdef USE_REPLAY
 		if (need_replay_cycle) replay_cycle();
 #endif
+		if (rewind_mode != REWIND_MODE_OFF && rewind_is_held()) {
+			if (rewind_step_backward()) {
+				char rewind_str[32];
+				if (rem_min > 0) {
+					snprintf(rewind_str, sizeof(rewind_str), "<< REWIND  %d MIN", rem_min);
+				} else {
+					snprintf(rewind_str, sizeof(rewind_str), "<< REWIND");
+				}
+				display_text_bottom(rewind_str);
+				text_time_remaining = 2;
+				text_time_total = 2;
+				draw_game_frame();
+				set_timer_length(timer_1, custom->base_speed);
+				do_simple_wait(timer_1);
+				continue;
+			} else if (rewind_get_count() == 0) {
+				display_text_bottom("<< REWIND (LIMIT)");
+				text_time_remaining = 2;
+				text_time_total = 2;
+				draw_game_frame();
+				set_timer_length(timer_1, custom->base_speed);
+				do_simple_wait(timer_1);
+				continue;
+			}
+		} else {
+			rewind_reset_hold_ticks();
+		}
+
 		if (Kid.sword == sword_2_drawn) {
 			// speed when fighting (smaller is faster)
 			set_timer_length(timer_1, /*6*/ custom->fight_speed);
@@ -374,6 +403,7 @@ int play_level_2() {
 		hitp_delta = 0;
 		timers();
 		play_frame();
+		rewind_record_frame();
 
 #ifdef USE_REPLAY
 		// At the exact "end of level" frame, preserve the seed to ensure reproducibility,
@@ -386,6 +416,7 @@ int play_level_2() {
 
 		if (is_restart_level) {
 			is_restart_level = 0;
+			rewind_clear();
 			return current_level;
 		} else {
 			if (next_level == current_level || check_sound_playing()) {

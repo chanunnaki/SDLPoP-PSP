@@ -186,6 +186,7 @@ enum setting_ids {
 	SETTING_ENABLE_QUICKSAVE,
 	SETTING_ENABLE_QUICKSAVE_PENALTY,
 	SETTING_ENABLE_REPLAY,
+	SETTING_REWIND,
 	SETTING_USE_FIXES_AND_ENHANCEMENTS,
 	SETTING_ENABLE_CROUCH_AFTER_CLIMBING,
 	SETTING_ENABLE_FREEZE_TIME_DURING_END_MUSIC,
@@ -393,6 +394,7 @@ NAMES_LIST(scaling_type_setting_names, {"Sharp", "Fuzzy", "Blurry",});
 #ifdef __PSP__
 NAMES_LIST(psp_display_mode_setting_names, {"16:10", "16:9 Wide", "4:3",});
 #endif
+NAMES_LIST(rewind_setting_names, {"OFF", "30 SEC", "60 SEC",});
 
 #ifndef __PSP__
 int integer_scaling_possible =
@@ -504,6 +506,13 @@ setting_type gameplay_settings[] = {
 						"To stop, press Ctrl+Tab again."},
 #endif
 #endif
+		{.id = SETTING_REWIND, .style = SETTING_STYLE_NUMBER, .number_type = SETTING_BYTE,
+				.min = 0, .max = 2, .linked = &rewind_mode, .names_list = &rewind_setting_names_list,
+				.text = "Rewind",
+				.explanation = "OFF - Disable in-memory rewind buffer.\n"
+				               "30 SEC - Record last 30s in RAM (~1.4MB).\n"
+				               "60 SEC - Record last 60s in RAM (~2.8MB).\n\n"
+				               "Hold L Shoulder during gameplay or death to rewind."},
 		{.id = SETTING_USE_FIXES_AND_ENHANCEMENTS, .style = SETTING_STYLE_TOGGLE, .linked = &use_fixes_and_enhancements,
 				.text = "Enhanced mode (allow bug fixes)",
 				.explanation = "Turn on game fixes and enhancements.\n"
@@ -1770,6 +1779,9 @@ void set_setting_value(setting_type* setting, int value) {
 				*(int*) setting->linked = value;
 				break;
 		}
+		if (setting->id == SETTING_REWIND) {
+			rewind_set_mode((byte) value);
+		}
 	}
 }
 
@@ -1999,6 +2011,11 @@ void draw_setting(setting_type* setting, rect_type* parent, int* y_offset, int i
 				increase_setting(setting, value);
 			} else if (menu_control_x < 0) {
 				decrease_setting(setting, value);
+			} else if (pressed_enter && setting->names_list != NULL) {
+				int next_val = (value >= setting->max) ? setting->min : value + 1;
+				set_setting_value(setting, next_val);
+				were_settings_changed = true;
+				play_menu_sound(sound_20_loose_shake_1);
 			}
 		}
 
@@ -2768,6 +2785,8 @@ void process_ingame_settings_user_managed(SDL_RWops* rw, rw_process_func_type pr
 	process(key_action    );
 	process(key_enter     );
 	process(key_esc       );
+	process(rewind_mode   );
+	rewind_set_mode(rewind_mode);
 #ifdef __PSP__
 	process(psp_display_mode);
 	process(enable_hud_split);
@@ -2826,7 +2845,7 @@ unsigned int crc32c(unsigned char *message, size_t size) {
 dword exe_crc = 0;
 void calculate_exe_crc(void) {
 #ifdef __PSP__
-	exe_crc = 0x50535001;
+	exe_crc = 0x50535002;
 #else
 	if (exe_crc == 0) {
 		// Get the CRC32 fingerprint of the executable.

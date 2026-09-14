@@ -98,6 +98,7 @@ NAMES_LIST(tile_type_names, {
 });
 NAMES_LIST(scaling_type_names, {"sharp", "fuzzy", "blurry"});
 KEY_VALUE_LIST(psp_display_mode_names, {{"16:10", 0}, {"original", 0}, {"wide", 1}, {"16:9", 1}, {"fullscreen", 1}, {"4:3", 2}, {"standard", 2}});
+KEY_VALUE_LIST(rewind_mode_names, {{"off", 0}, {"false", 0}, {"0", 0}, {"30", 1}, {"30 sec", 1}, {"30sec", 1}, {"1", 1}, {"60", 2}, {"60 sec", 2}, {"60sec", 2}, {"2", 2}});
 NAMES_LIST(row_names, {"top", "middle", "bottom"});
 KEY_VALUE_LIST(direction_names, {{"left", dir_FF_left}, {"right", dir_0_right}});
 NAMES_LIST(entry_pose_names, {"turning", "falling", "running"});
@@ -252,6 +253,7 @@ static int global_ini_callback(const char *section, const char *name, const char
 #ifdef USE_LIGHTING
 		process_boolean("enable_lighting", &enable_lighting);
 #endif
+		process_byte("rewind", &rewind_mode, &rewind_mode_names_list);
 	}
 
 	if (check_ini_section("Enhancements")) {
@@ -502,6 +504,7 @@ void set_options_to_default() {
 	enable_quicksave = 1;
 	enable_quicksave_penalty = 1;
 	enable_replay = 1;
+	rewind_mode = 1;
 #ifdef __PSP__
 	psp_display_mode = 0;
 	enable_hud_split = 1;
@@ -521,6 +524,7 @@ void set_options_to_default() {
 void load_global_options() {
 	set_options_to_default();
 	ini_load(locate_file("SDLPoP.ini"), global_ini_callback); // global configuration
+	rewind_set_mode(rewind_mode);
 #ifndef __PSP__
 	load_dos_exe_modifications("."); // read PRINCE.EXE in the current working directory
 #endif

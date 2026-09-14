@@ -62,8 +62,6 @@ dword savestate_size = 0;
 #define MAX_SAVESTATE_SIZE 4096
 
 // These are defined in seg000.c:
-typedef int process_func_type(void* data, size_t data_size);
-extern int quick_process(process_func_type process_func);
 extern const char quick_version[9];
 
 // header information read from the first part of a replay file

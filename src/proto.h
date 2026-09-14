@@ -78,6 +78,8 @@ void show_splash(void);
 void check_quick_op(void);
 void restore_room_after_quick_load(void);
 #endif // USE_QUICKSAVE
+typedef int process_func_type(void* data, size_t data_size);
+int quick_process(process_func_type process_func);
 const char* get_writable_file_path(char* custom_path_buffer, size_t max_len, const char* file_name);
 void redefine_key(const char* name, int* key);
 
@@ -731,3 +733,5 @@ void stop_midi(void);
 void init_midi(void);
 void midi_callback(void *userdata, Uint8 *stream, int len);
 void play_midi_sound(sound_buffer_type* buffer);
+
+#include "rewind.h"

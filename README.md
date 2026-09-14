@@ -37,6 +37,12 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
   - Displays active levelset status (`ACTIVE` indicator) and switches mods on-the-fly without returning to the PSP XMB.
   - Seamless in-memory soft reset reloads graphics, sounds, and levels, restarting directly into the mod's title and intro sequence.
   - Safe error recovery: if a configured mod folder is missing or deleted, the game warns the player, automatically reverts to the original game, and heals `SDLPoP.ini`.
+- **Real-Time In-Memory Ring-Buffer Rewind (30s / 60s)**:
+  - Hold **L Shoulder** (or **L/R** on keyboard) anytime during gameplay or after the Prince dies to fluidly roll back time (smooth acceleration from 1x to 2x speed).
+  - High-performance circular in-RAM buffer captures game states at 12 FPS without touching the Memory Stick.
+  - Seamlessly restores Kid position, guard positions and HP, chompers, falling loose floors, gates, spikes, and the level countdown clock.
+  - Releasing **L Shoulder** immediately resumes forward play from the rewound point, overwriting future history.
+  - Configurable under **Settings $\to$ GAMEPLAY $\to$ Rewind**: `OFF`, `30 SEC` (~1.4MB RAM), or `60 SEC` (~2.8MB RAM).
 - **Ergonomic Handheld Controls**:
   - Smooth action on Face buttons and Shoulder triggers tailored for handheld play.
 
@@ -47,11 +53,12 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
 | PSP Button | Function in Game | Function in Menus |
 |---|---|---|
 | **D-Pad / Analog Stick** | Move Left / Right, Crouch Down, Jump Up | Navigate Options |
-| **Cross ($\times$)** | Action / Shift (Grab ledge, strike sword, careful walk) | Confirm / Select |
+| **Cross ($\times$)** | Action / Shift (Grab ledge, strike sword, careful walk) | Confirm / Select / Cycle Setting |
 | **Square ($\square$)** | Action / Shift (Grab ledge, strike sword, careful walk) | Confirm / Select |
 | **Triangle ($\triangle$)** | Jump Up / Climb Ledge | - |
 | **Circle ($\bigcirc$)** | Jump Up / Climb Ledge | Cancel / Back |
-| **L / R Shoulders** | Action / Shift (easy hold while running) | - |
+| **L Shoulder** | **Hold to Rewind Time** (or Shift if Rewind is OFF) | - |
+| **R Shoulder** | Action / Shift (Grab ledge, strike sword, careful walk) | - |
 | **Start** | Pause Game / In-Game Menu | Close / Return to Game |
 | **Select** | Display Time Remaining | - |
 
