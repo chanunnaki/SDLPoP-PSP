@@ -70,14 +70,10 @@ int proc_cutscene_frame(int wait_frames) {
 		play_both_seq();
 		draw_proom_drects(); // changed order of drects and flash
 		if (flash_time) {
-			if (flash_time % 2 != 0) {
-				do_flash(flash_color);
-				active_flash_color = flash_color;
-			} else {
-				remove_flash();
-			}
+			do_flash(flash_color);
+		}
+		if (flash_time) {
 			--flash_time;
-		} else if (active_flash_color != 0) {
 			remove_flash();
 		}
 		if (!check_sound_playing()) {
@@ -546,6 +542,12 @@ void do_flash(short color) {
 	if (color) {
 		if (graphics_mode == gmMcgaVga) {
 			set_bg_attr(0, color);
+			update_screen();
+#ifdef __PSP__
+			sceDisplayWaitVblankStart();
+#else
+			delay_ticks(1);
+#endif
 		}
 	}
 }

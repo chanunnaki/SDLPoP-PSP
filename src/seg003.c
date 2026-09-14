@@ -801,61 +801,37 @@ void do_mouse() {
 	saveshad();
 }
 
-static word last_flash_time = 0;
-static int flash_frame_toggle = 0;
-
 // seg003:0AFC
 int flash_if_hurt() {
-	short target_color = 0;
-
 	if (flash_time != 0) {
-		if (flash_time > last_flash_time) {
-			// A new flash sequence has started: start with flash active
-			flash_frame_toggle = 1;
-		}
-
-		if (flash_frame_toggle) {
-			target_color = flash_color;
-		} else {
-			target_color = 0;
-		}
-
-		flash_frame_toggle = !flash_frame_toggle;
-		--flash_time;
-		last_flash_time = flash_time;
-	} else {
-		last_flash_time = 0;
-		flash_frame_toggle = 0;
-		if (hitp_delta < 0) {
-			if (is_joyst_mode && enable_controller_rumble) {
-				if (sdl_haptic != NULL) {
-					SDL_HapticRumblePlay(sdl_haptic, 1.0, 100); // rumble at full strength for 100 milliseconds
-#if SDL_VERSION_ATLEAST(2,0,9)
-				} else if (sdl_controller_ != NULL) {
-					SDL_GameControllerRumble(sdl_controller_, 0xFFFF, 0xFFFF, 100);
-				} else {
-					SDL_JoystickRumble(sdl_joystick_, 0xFFFF, 0xFFFF, 100);
-#endif
-				}
-			}
-			target_color = color_12_brightred; // red
-		}
-	}
-
-	if (target_color != 0) {
-		do_flash(target_color);
-		active_flash_color = target_color;
+		do_flash(flash_color);
+		active_flash_color = flash_color;
 		return 1;
-	} else if (active_flash_color != 0) {
-		// Previous frame was a flash, now return to normal black
-		remove_flash();
-		active_flash_color = 0;
+	} else if (hitp_delta < 0) {
+		if (is_joyst_mode && enable_controller_rumble) {
+			if (sdl_haptic != NULL) {
+				SDL_HapticRumblePlay(sdl_haptic, 1.0, 100); // rumble at full strength for 100 milliseconds
+#if SDL_VERSION_ATLEAST(2,0,9)
+			} else if (sdl_controller_ != NULL) {
+				SDL_GameControllerRumble(sdl_controller_, 0xFFFF, 0xFFFF, 100);
+			} else {
+				SDL_JoystickRumble(sdl_joystick_, 0xFFFF, 0xFFFF, 100);
+#endif
+			}
+		}
+		do_flash(color_12_brightred); // red
+		active_flash_color = color_12_brightred;
+		return 1;
 	}
-
 	return 0; // not flashed
 }
 
 // seg003:0B1A
 void remove_flash_if_hurt() {
-	// Frame-synchronized flash lifecycle is managed in flash_if_hurt() without mid-frame delay
+	if (flash_time != 0) {
+		--flash_time;
+	} else {
+		if (hitp_delta >= 0) return;
+	}
+	remove_flash();
 }
