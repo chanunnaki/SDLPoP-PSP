@@ -43,6 +43,11 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
   - Seamlessly restores Kid position, guard positions and HP, chompers, falling loose floors, gates, spikes, and the level countdown clock.
   - Releasing **L Shoulder** immediately resumes forward play from the rewound point, overwriting future history.
   - Configurable under **Settings $\to$ GAMEPLAY $\to$ Rewind**: `OFF`, `30 SEC` (~1.4MB RAM), or `60 SEC` (~2.8MB RAM).
+- **Hardware VSync-Locked Pipeline & Rapid 12 Hz Screen Strobing (v1.1.0)**:
+  - Hardware-synchronized `NEXTFRAME` display buffer exchange with post-present vertical blanking waits eliminates 100% of horizontal tearing and mid-screen buffer cuts across the entire PSP LCD screen.
+  - Sword pickup and healing potions produce authentic, tear-free rapid 12 Hz flash strobes synced to the hardware refresh rate.
+  - Eliminates GPU/scanout raster collisions in 60 FPS cutscenes and fixes cutscene surface buffer geometry.
+  - Rewind enhancements: clean triangular HP HUD restoration across life potions, and instant neighbor room rendering during boundary rewinds.
 - **Ergonomic Handheld Controls**:
   - Smooth action on Face buttons and Shoulder triggers tailored for handheld play.
 
