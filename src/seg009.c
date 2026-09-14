@@ -2994,6 +2994,9 @@ void update_screen() {
 #else
 	SDL_RenderCopy(renderer_, target_texture, NULL, NULL);
 #endif
+#ifdef __PSP__
+	sceDisplayWaitVblankStart();
+#endif
 	SDL_RenderPresent(renderer_);
 }
 

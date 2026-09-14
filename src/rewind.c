@@ -280,6 +280,9 @@ int rewind_step_backward(void) {
 	text_time_total = text_time_remaining = 0;
 	exit_room_timer = 0;
 	is_restart_level = 0;
+	if (active_flash_color != 0) {
+		remove_flash();
+	}
 
 	return 1;
 }

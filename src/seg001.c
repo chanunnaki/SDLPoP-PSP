@@ -70,10 +70,14 @@ int proc_cutscene_frame(int wait_frames) {
 		play_both_seq();
 		draw_proom_drects(); // changed order of drects and flash
 		if (flash_time) {
-			do_flash(flash_color);
-		}
-		if (flash_time) {
+			if (flash_time % 2 != 0) {
+				do_flash(flash_color);
+				active_flash_color = flash_color;
+			} else {
+				remove_flash();
+			}
 			--flash_time;
+		} else if (active_flash_color != 0) {
 			remove_flash();
 		}
 		if (!check_sound_playing()) {
@@ -539,15 +543,9 @@ void reset_cutscene() {
 
 // seg001:0908
 void do_flash(short color) {
-	// stub
 	if (color) {
 		if (graphics_mode == gmMcgaVga) {
-			reset_timer(timer_2);
-			set_timer_length(timer_2, 2);
 			set_bg_attr(0, color);
-			if (color != 0) do_simple_wait(timer_2); // give some time to show the flash
-		} else {
-			// ...
 		}
 	}
 }
@@ -565,12 +563,10 @@ void delay_ticks(Uint32 ticks) {
 
 // seg001:0981
 void remove_flash() {
-	// stub
 	if (graphics_mode == gmMcgaVga) {
 		set_bg_attr(0, 0);
-	} else {
-		// ...
 	}
+	active_flash_color = 0;
 }
 
 // seg001:09D7

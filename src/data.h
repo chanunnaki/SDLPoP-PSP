@@ -287,6 +287,7 @@ extern short hitp_delta;
 extern word flash_color;
 // data:4350
 extern word flash_time;
+extern short active_flash_color;
 // data:42DC
 extern char_type Guard;
 
