@@ -661,6 +661,10 @@ void load_intro(int which_imgs,cutscene_ptr_type func,int free_sounds) {
 	if (free_sounds) {
 		free_optional_sounds();
 	}
+	if (offscreen_surface != NULL && offscreen_surface->h < 200) {
+		free_surface(offscreen_surface);
+		offscreen_surface = make_offscreen_buffer(&screen_rect);
+	}
 	free_all_chtabs_from(id_chtab_3_princessinstory);
 	load_chtab_from_file(id_chtab_8_princessroom, 950, "PV.DAT", 1<<13);
 	load_chtab_from_file(id_chtab_9_princessbed, 980, "PV.DAT", 1<<14);
@@ -692,6 +696,10 @@ void load_intro(int which_imgs,cutscene_ptr_type func,int free_sounds) {
 	is_cutscene = 0;
 	free_all_chtabs_from(3);
 	draw_rect(&screen_rect, color_0_black);
+	if (offscreen_surface != NULL && offscreen_surface->h == 200) {
+		free_surface(offscreen_surface);
+		offscreen_surface = make_offscreen_buffer(&rect_top);
+	}
 }
 
 typedef struct star_type {

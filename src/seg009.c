@@ -2738,8 +2738,8 @@ void set_gr_mode(byte grmode) {
 	                           SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
 	                           pop_window_width, pop_window_height, flags);
 #ifdef __PSP__
-	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "1");
-	flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
+	flags = SDL_RENDERER_ACCELERATED;
 #else
 	// Make absolutely sure that VSync will be off, to prevent timer issues.
 	SDL_SetHint(SDL_HINT_RENDER_VSYNC, "0");
@@ -2754,7 +2754,7 @@ void set_gr_mode(byte grmode) {
 #endif
 	renderer_ = SDL_CreateRenderer(window_, -1 , flags | SDL_RENDERER_TARGETTEXTURE);
 #ifdef __PSP__
-	guSwapBuffersBehaviour(PSP_DISPLAY_SETBUF_IMMEDIATE);
+	guSwapBuffersBehaviour(PSP_DISPLAY_SETBUF_NEXTFRAME);
 #endif
 	SDL_RendererInfo renderer_info;
 	if (SDL_GetRendererInfo(renderer_, &renderer_info) == 0) {
@@ -3003,6 +3003,9 @@ void update_screen() {
 	SDL_RenderCopy(renderer_, target_texture, NULL, NULL);
 #endif
 	SDL_RenderPresent(renderer_);
+#ifdef __PSP__
+	sceDisplayWaitVblankStart();
+#endif
 }
 
 // seg009:9289
