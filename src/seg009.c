@@ -2754,7 +2754,7 @@ void set_gr_mode(byte grmode) {
 #endif
 	renderer_ = SDL_CreateRenderer(window_, -1 , flags | SDL_RENDERER_TARGETTEXTURE);
 #ifdef __PSP__
-	guSwapBuffersBehaviour(PSP_DISPLAY_SETBUF_NEXTFRAME);
+	guSwapBuffersBehaviour(PSP_DISPLAY_SETBUF_IMMEDIATE);
 #endif
 	SDL_RendererInfo renderer_info;
 	if (SDL_GetRendererInfo(renderer_, &renderer_info) == 0) {

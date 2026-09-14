@@ -839,16 +839,16 @@ int process_key() {
 				}
 			break;
 			case SDL_SCANCODE_S | WITH_SHIFT: // Shift+S
+				play_sound(sound_33_small_potion); // small potion (cheat)
+				flash_color = color_12_brightred;
+				flash_time = 2;
 				if (hitp_curr != hitp_max) {
-					play_sound(sound_33_small_potion); // small potion (cheat)
 					hitp_delta = 1;
-					flash_color = 4; // red
-					flash_time = 2;
 				}
 			break;
 			case SDL_SCANCODE_T | WITH_SHIFT: // Shift+T
 				play_sound(sound_30_big_potion); // big potion (cheat)
-				flash_color = 4; // red
+				flash_color = color_12_brightred;
 				flash_time = 4;
 				add_life();
 			break;
