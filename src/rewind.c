@@ -2,6 +2,9 @@
 #include "data.h"
 #include "proto.h"
 #include "rewind.h"
+#ifdef __PSP__
+#include <pspctrl.h>
+#endif
 
 typedef struct {
 	word size;
@@ -113,9 +116,17 @@ void rewind_record_frame(void) {
 
 bool rewind_is_held(void) {
 	if (rewind_mode == REWIND_MODE_OFF) return false;
-	// PSP L-Shoulder button:
+#ifdef __PSP__
+	SceCtrlData pad;
+	sceCtrlPeekBufferPositive(&pad, 1);
+	if (pad.Buttons & PSP_CTRL_LTRIGGER) {
+		return true;
+	} else {
+		// Physical L trigger is not held: clear any lingering held flag
+		joy_button_states[JOYINPUT_LEFTSHOULDER] &= ~KEYSTATE_HELD;
+	}
+#endif
 	if (joy_button_states[JOYINPUT_LEFTSHOULDER] & KEYSTATE_HELD) return true;
-	// Keyboard bindings (L or R):
 	if (key_states[SDL_SCANCODE_L] & KEYSTATE_HELD) return true;
 	if (key_states[SDL_SCANCODE_R] & KEYSTATE_HELD) return true;
 	return false;
@@ -128,14 +139,8 @@ int rewind_step_backward(void) {
 
 	rewind_hold_ticks++;
 
-	// Gentle acceleration: initial 4 ticks step 1 frame, then 2 frames per tick (2x speed)
-	int step = (rewind_hold_ticks > 4) ? 2 : 1;
-	if (step > rewind_buf.count) {
-		step = rewind_buf.count;
-	}
-	if (step <= 0) {
-		return 0;
-	}
+	// Step 1 frame at a time for smooth reverse animation
+	int step = 1;
 
 	// Move head back by step
 	rewind_buf.head = (rewind_buf.head - step + rewind_buf.capacity) % rewind_buf.capacity;
@@ -156,10 +161,16 @@ int rewind_step_backward(void) {
 		is_feather_fall = 0;
 	}
 
-	// Restore room links, sprites, and HP without disk I/O
-	different_room = 1;
-	next_room = drawn_room = Kid.room;
-	load_room_links();
+	// Update room links if room changed, but DO NOT set different_room = 1 (prevents black screen flash)
+	if (drawn_room != Kid.room) {
+		next_room = drawn_room = Kid.room;
+		load_room_links();
+		if (custom->tbl_level_type[current_level]) {
+			gen_palace_wall_colors();
+		}
+	}
+	different_room = 0;
+	need_full_redraw = 0;
 
 	hitp_delta = guardhp_delta = 1;
 	if (Guard.room != drawn_room) {
@@ -167,7 +178,6 @@ int rewind_step_backward(void) {
 		guardhp_curr = 0;
 	}
 
-	draw_hp();
 	loadkid_and_opp();
 
 	// Clear any death message or level restart state

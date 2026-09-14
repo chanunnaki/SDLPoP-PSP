@@ -366,30 +366,31 @@ int play_level_2() {
 #endif
 		if (rewind_mode != REWIND_MODE_OFF && rewind_is_held()) {
 			if (rewind_step_backward()) {
-				char rewind_str[32];
-				if (rem_min > 0) {
-					snprintf(rewind_str, sizeof(rewind_str), "<< REWIND  %d MIN", rem_min);
-				} else {
-					snprintf(rewind_str, sizeof(rewind_str), "<< REWIND");
-				}
-				display_text_bottom(rewind_str);
+				redraw_screen(0);
+				draw_hp();
+				display_text_bottom("<< REWIND");
 				text_time_remaining = 2;
 				text_time_total = 2;
-				draw_game_frame();
-				set_timer_length(timer_1, custom->base_speed);
-				do_simple_wait(timer_1);
+				idle();
+				delay_ticks(3);
 				continue;
 			} else if (rewind_get_count() == 0) {
+				redraw_screen(0);
+				draw_hp();
 				display_text_bottom("<< REWIND (LIMIT)");
 				text_time_remaining = 2;
 				text_time_total = 2;
-				draw_game_frame();
-				set_timer_length(timer_1, custom->base_speed);
-				do_simple_wait(timer_1);
+				idle();
+				delay_ticks(3);
 				continue;
 			}
 		} else {
-			rewind_reset_hold_ticks();
+			if (rewind_get_hold_ticks() > 0) {
+				erase_bottom_text(1);
+				text_time_total = text_time_remaining = 0;
+				reset_timer(timer_1);
+				rewind_reset_hold_ticks();
+			}
 		}
 
 		if (Kid.sword == sword_2_drawn) {
