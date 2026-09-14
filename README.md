@@ -5,7 +5,7 @@ Native port of **Prince of Persia** (SDLPoP) for the Sony PlayStation Portable (
 
 ## What's New in v1.1.0
 
-- **Real-Time Rewind (Headline Feature)**:
+- **Real-Time Rewind**:
   - **Hold L Shoulder** anytime to rewind time! Missed a jump, mistimed a parry, or fell on spikes? Hold **L** to roll back your mistake and try again.
   - **Variable Speed**: While holding L, tap or hold **Left** or **Right** on the D-Pad to speed up rewind from 1x up to 4x.
   - **Configurable**: Choose between **30 Seconds**, **60 Seconds**, or **Off** in **Settings $\to$ GAMEPLAY $\to$ Rewind**.
